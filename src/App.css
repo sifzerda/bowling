@@ -37,6 +37,25 @@
   padding: 2em;
 }
 
-.read-the-docs {
-  color: #888;
+/* bowling*/
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  align-items: center;
+  justify-content: center;
+  background-color: #282c34;
+  color: white;
+}
+
+canvas {
+  border: 1px solid white;
+}
+ 
+.parent-container {
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+  width: 500px;
+  border: 3px solid rgb(30, 255, 0);
 }

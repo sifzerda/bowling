@@ -1,5 +1,6 @@
 // src/DrumMachine.js
- 
+
+import BowlingGame from "../components/BowlingGame";
 
 const Spare = () => {
   return (
@@ -7,7 +8,7 @@ const Spare = () => {
       <h1>Vexflow Page</h1>
       <p>Welcome to the Home Page!</p>
 
-
+<BowlingGame />
 
     </div>
   );
