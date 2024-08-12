@@ -1,5 +1,5 @@
 // src/DrumMachine.js
-
+import '../bowling.css';
 import BowlingGame from "../components/BowlingGame";
 
 const Spare = () => {

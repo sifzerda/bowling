@@ -28,7 +28,7 @@ function App() {
               <Link to="/spare">VexFlow</Link>
             </li>
             <li>
-              <Link to="/spare2">ABCjs</Link>
+              <Link to="/spare2">Bowling</Link>
             </li>
           </ul>
         </nav>
