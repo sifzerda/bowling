@@ -1,0 +1,23 @@
+/* MatterComponent.css */
+
+.App {
+    text-align: center;
+  }
+  
+  h1 {
+    margin: 20px;
+  }
+
+  /* styles.css */
+.matter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0; /* Light gray background */
+  }
+  
+  .matter-canvas {
+    border: 2px solid #333; /* Darker border for contrast */
+    background-color: #ffffff; /* White background for the canvas */
+  }

@@ -5,7 +5,6 @@ import './App.css';
 import Home from './pages/Home';
 import About from './pages/About';
 import Contact from './pages/Contact';
-import Spare from './pages/Spare';
 import Spare2 from './pages/Spare2';
 
 function App() {
@@ -25,9 +24,6 @@ function App() {
               <Link to="/contact">Contact</Link>
             </li>
             <li>
-              <Link to="/spare">VexFlow</Link>
-            </li>
-            <li>
               <Link to="/spare2">Bowling</Link>
             </li>
           </ul>
@@ -37,7 +33,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/spare" element={<Spare />} />
           <Route path="/spare2" element={<Spare2 />} />
         </Routes>
       </div>
