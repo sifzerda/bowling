@@ -1,4 +1,4 @@
-# trial-bike
+# bowling
 
  + Borrows game world template from Matter.js 'xxx' demo
  + 
