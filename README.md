@@ -9,6 +9,15 @@
 + The three-fiber canvas takes its dimensions from its parent container. If you don't set them the canvas will expand in size indefinitely. Size set by 'div.parent-container'
 
 
+tech used:
+- matter.js = 
+- poly decomp = 
+- prop-types = 
+- react hotkeys hook
+- three.js: fiber, drei, cannon = 
+- zustand = 
+- cannon.js: physics engine/collision = 
+
 
 
 

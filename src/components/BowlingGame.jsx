@@ -1,44 +1,48 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import PropTypes from "prop-types";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+import { useControls } from 'leva'
 import { Physics, useBox, useSphere, usePlane } from "@react-three/cannon";
 import { Vector3 } from "three";
 
 const BowlingBall = ({ position }) => {
+  const { forwardForce, lateralForce } = useControls({
+    forwardForce: { value: 5, min: 1, max: 20, step: 0.5 },
+    lateralForce: { value: 5, min: 1, max: 20, step: 0.5 },
+  });
+
   const [ref, api] = useSphere(() => ({
     mass: 1,
     position: position.toArray(),
     args: [0.5],
   }));
 
-  // Handle key press to apply force
   const handleKeyDown = (event) => {
     switch (event.key) {
       case "ArrowUp":
-        api.applyForce([0, 0, -5], [0, 0, 0]);
+        api.applyForce([0, 0, -forwardForce], [0, 0, 0]);
         break;
       case "ArrowDown":
-        api.applyForce([0, 0, 5], [0, 0, 0]);
+        api.applyForce([0, 0, forwardForce], [0, 0, 0]);
         break;
       case "ArrowLeft":
-        api.applyForce([-5, 0, 0], [0, 0, 0]);
+        api.applyForce([-lateralForce, 0, 0], [0, 0, 0]);
         break;
       case "ArrowRight":
-        api.applyForce([5, 0, 0], [0, 0, 0]);
+        api.applyForce([lateralForce, 0, 0], [0, 0, 0]);
         break;
       default:
         break;
     }
   };
 
-  // Add event listener for keydown
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [forwardForce, lateralForce]);
 
   return (
     <mesh ref={ref} castShadow>
