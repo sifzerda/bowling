@@ -166,7 +166,7 @@ const App = () => {
             scale={[1, 1, 1]}
             receiveShadow
           />
-          <BowlingBall position={new Vector3(0, 0.5, 0)} />
+          <BowlingBall position={new Vector3(0, 1, 0)} />
           {pinPositions.map((pos, index) => (
             <BowlingPin key={index} position={pos} />
           ))}
