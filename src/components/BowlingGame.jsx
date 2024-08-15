@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
@@ -92,16 +91,12 @@ const BowlingBall = ({ position }) => {
   );
 };
 
-BowlingBall.propTypes = {
-  position: PropTypes.instanceOf(Vector3).isRequired,
-};
-
 // BowlingPin Component
 const BowlingPin = ({ position }) => {
   const [ref] = useBox(() => ({
     mass: 0.5,
     position: position.toArray(),
-    args: [0.2, 1, 0.2], // Adjust these dimensions to fit your needs
+    args: [0.2, 1, 0.2],
   }));
 
   return (
@@ -110,10 +105,6 @@ const BowlingPin = ({ position }) => {
       <meshStandardMaterial color="white" />
     </mesh>
   );
-};
-
-BowlingPin.propTypes = {
-  position: PropTypes.instanceOf(Vector3).isRequired,
 };
 
 // BowlingLane Component
@@ -133,6 +124,12 @@ const BowlingLane = () => {
 
 // Main App Component
 const App = () => {
+  const { cameraPosition, cameraFov, debugMode } = useControls('Settings', {
+    cameraPosition: { value: [0, 5, 10], step: 0.1 },
+    cameraFov: { value: 50, min: 30, max: 100, step: 1 },
+    debugMode: { value: false }
+  });
+
   const pinPositions = [
     new Vector3(0, 0, -8),
     new Vector3(-0.3, 0, -7.8),
@@ -150,10 +147,11 @@ const App = () => {
     <div className="parent-container">
       <Canvas
         shadows
-        camera={{ position: [0, 5, 10], fov: 50, near: 0.1, far: 1000 }}
+        camera={{ position: cameraPosition, fov: cameraFov, near: 0.1, far: 1000 }}
       >
         <Lights />
         <Physics gravity={[0, -9.81, 0]} allowSleep={false}>
+          {debugMode && <Debug />}
           <BowlingLane />
           <BowlingBall position={new Vector3(0, 0.5, 0)} />
           {pinPositions.map((pos, index) => (
