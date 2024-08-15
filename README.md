@@ -17,6 +17,7 @@ tech used:
 - three.js: fiber, drei, cannon = 
 - zustand = 
 - cannon.js: physics engine/collision = 
+- leva = creates an input control panel to change lights and ball movement
 
 
 

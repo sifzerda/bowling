@@ -1,13 +1,53 @@
-import { useEffect } from "react";
-import PropTypes from "prop-types";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import { useControls } from 'leva'
-import { Physics, useBox, useSphere, usePlane } from "@react-three/cannon";
-import { Vector3 } from "three";
+import { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { useControls } from 'leva';
+import { Physics, useBox, useSphere, usePlane } from '@react-three/cannon';
+import { Vector3 } from 'three';
 
+// Lights Component
+const Lights = () => {
+  const ambientCtl = useControls('Ambient Light', {
+    visible: false,
+    intensity: { value: 1.0, min: 0, max: 1.0, step: 0.1 },
+  });
+
+  const directionalCtl = useControls('Directional Light', {
+    visible: true,
+    position: { x: 3.3, y: 1.0, z: 4.4 },
+    castShadow: true,
+  });
+
+  const pointCtl = useControls('Point Light', {
+    visible: false,
+    position: { x: 2, y: 0, z: 0 },
+    castShadow: true,
+  });
+
+  const spotCtl = useControls('Spot Light', {
+    visible: false,
+    position: { x: 3, y: 2.5, z: 1 },
+    castShadow: true,
+  });
+
+  return (
+    <>
+      <ambientLight visible={ambientCtl.visible} intensity={ambientCtl.intensity} />
+      <directionalLight
+        visible={directionalCtl.visible}
+        position={[directionalCtl.position.x, directionalCtl.position.y, directionalCtl.position.z]}
+        castShadow={directionalCtl.castShadow}
+      />
+      <pointLight visible={pointCtl.visible} position={[pointCtl.position.x, pointCtl.position.y, pointCtl.position.z]} castShadow={pointCtl.castShadow} />
+      <spotLight visible={spotCtl.visible} position={[spotCtl.position.x, spotCtl.position.y, spotCtl.position.z]} castShadow={spotCtl.castShadow} />
+    </>
+  );
+};
+
+// BowlingBall Component
 const BowlingBall = ({ position }) => {
-  const { forwardForce, lateralForce } = useControls({
+  const { forwardForce, lateralForce } = useControls('Ball Physics', {
     forwardForce: { value: 5, min: 1, max: 20, step: 0.5 },
     lateralForce: { value: 5, min: 1, max: 20, step: 0.5 },
   });
@@ -20,16 +60,16 @@ const BowlingBall = ({ position }) => {
 
   const handleKeyDown = (event) => {
     switch (event.key) {
-      case "ArrowUp":
+      case 'ArrowUp':
         api.applyForce([0, 0, -forwardForce], [0, 0, 0]);
         break;
-      case "ArrowDown":
+      case 'ArrowDown':
         api.applyForce([0, 0, forwardForce], [0, 0, 0]);
         break;
-      case "ArrowLeft":
+      case 'ArrowLeft':
         api.applyForce([-lateralForce, 0, 0], [0, 0, 0]);
         break;
-      case "ArrowRight":
+      case 'ArrowRight':
         api.applyForce([lateralForce, 0, 0], [0, 0, 0]);
         break;
       default:
@@ -38,9 +78,9 @@ const BowlingBall = ({ position }) => {
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [forwardForce, lateralForce]);
 
@@ -56,16 +96,17 @@ BowlingBall.propTypes = {
   position: PropTypes.instanceOf(Vector3).isRequired,
 };
 
+// BowlingPin Component
 const BowlingPin = ({ position }) => {
   const [ref] = useBox(() => ({
     mass: 0.5,
     position: position.toArray(),
-    args: [0.2, 1, 0.2],
+    args: [0.2, 1, 0.2], // Adjust these dimensions to fit your needs
   }));
 
   return (
     <mesh ref={ref} castShadow>
-      <boxGeometry args={[0.2, 1, 0.2]} />
+      <cylinderGeometry args={[0.2, 0.3, 1, 16]} />
       <meshStandardMaterial color="white" />
     </mesh>
   );
@@ -75,6 +116,7 @@ BowlingPin.propTypes = {
   position: PropTypes.instanceOf(Vector3).isRequired,
 };
 
+// BowlingLane Component
 const BowlingLane = () => {
   const [ref] = usePlane(() => ({
     rotation: [-Math.PI / 2, 0, 0],
@@ -89,6 +131,7 @@ const BowlingLane = () => {
   );
 };
 
+// Main App Component
 const App = () => {
   const pinPositions = [
     new Vector3(0, 0, -8),
@@ -107,27 +150,18 @@ const App = () => {
     <div className="parent-container">
       <Canvas
         shadows
-        camera={{
-          position: [0, 5, 10],
-          fov: 50,
-          near: 0.1,
-          far: 1000,
-        }}
+        camera={{ position: [0, 5, 10], fov: 50, near: 0.1, far: 1000 }}
       >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
-        <Physics
-          gravity={[0, -9.81, 0]} // Ensure gravity is set to simulate realistic physics
-          allowSleep={false} // Keep physics objects active to avoid unnecessary sleeping
-        >
+        <Lights />
+        <Physics gravity={[0, -9.81, 0]} allowSleep={false}>
           <BowlingLane />
-          <BowlingBall position={new Vector3(0, 0.5, 0)} /> {/* Position above the lane to avoid initial collision */}
+          <BowlingBall position={new Vector3(0, 0.5, 0)} />
           {pinPositions.map((pos, index) => (
             <BowlingPin key={index} position={pos} />
           ))}
         </Physics>
         <OrbitControls
-          enableZoom={false}
+          enableZoom={true}
           enablePan={true}
           enableRotate={true}
           maxPolarAngle={Math.PI / 2}
