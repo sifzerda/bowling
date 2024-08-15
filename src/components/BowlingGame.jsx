@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
-import { Physics, useBox, useSphere, usePlane, Debug } from '@react-three/cannon';
+import { Physics, useBox, useSphere, Debug } from '@react-three/cannon';
 import { Vector3 } from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 
@@ -108,6 +108,22 @@ const BowlingPin = ({ position }) => {
   );
 };
 
+// BowlingLane Component
+const BowlingLane = () => {
+  const [ref] = useBox(() => ({
+    position: [0, 0, 0],
+    args: [5, 0.1, 20], // Adjust these dimensions to fit the lane's size
+    isStatic: true, // This makes the lane immovable
+  }));
+
+  return (
+    <mesh ref={ref} receiveShadow>
+      <boxGeometry args={[5, 0.1, 20]} />
+      <meshStandardMaterial color="grey" />
+    </mesh>
+  );
+};
+
 // Main App Component
 const App = () => {
   const { cameraPosition, cameraFov, debugMode } = useControls('Settings', {
@@ -141,6 +157,7 @@ const App = () => {
         <Lights />
         <Physics gravity={[0, -9.81, 0]} allowSleep={false}>
           {debugMode && <Debug />}
+          <BowlingLane />
           {/* Render the custom OBJ model directly */}
           <primitive 
             object={obj} 
