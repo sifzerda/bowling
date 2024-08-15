@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useEffect, useRef } from 'react';
+import { Canvas, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
 import { Physics, useBox, useSphere, usePlane, Debug } from '@react-three/cannon';
 import { Vector3 } from 'three';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 
 // Lights Component
 const Lights = () => {
@@ -107,21 +108,6 @@ const BowlingPin = ({ position }) => {
   );
 };
 
-// BowlingLane Component
-const BowlingLane = () => {
-  const [ref] = usePlane(() => ({
-    rotation: [-Math.PI / 2, 0, 0],
-    position: [0, -0.5, 0],
-  }));
-
-  return (
-    <mesh ref={ref} receiveShadow>
-      <planeGeometry args={[5, 20]} />
-      <meshStandardMaterial color="tan" />
-    </mesh>
-  );
-};
-
 // Main App Component
 const App = () => {
   const { cameraPosition, cameraFov, debugMode } = useControls('Settings', {
@@ -143,6 +129,9 @@ const App = () => {
     new Vector3(0.9, 0, -7.4),
   ];
 
+  const obj = useLoader(OBJLoader, '../../public/models/Bowling_Alley_OBJ.obj');
+  const ref = useRef();
+
   return (
     <div className="parent-container">
       <Canvas
@@ -152,16 +141,23 @@ const App = () => {
         <Lights />
         <Physics gravity={[0, -9.81, 0]} allowSleep={false}>
           {debugMode && <Debug />}
-          <BowlingLane />
+          {/* Render the custom OBJ model directly */}
+          <primitive 
+            object={obj} 
+            ref={ref}
+            position={[0, -0.5, 0]} 
+            scale={[1, 1, 1]}
+            receiveShadow
+          />
           <BowlingBall position={new Vector3(0, 0.5, 0)} />
           {pinPositions.map((pos, index) => (
             <BowlingPin key={index} position={pos} />
           ))}
         </Physics>
         <OrbitControls
-          enableZoom={true}
-          enablePan={true}
-          enableRotate={true}
+          enableZoom
+          enablePan
+          enableRotate
           maxPolarAngle={Math.PI / 2}
           minPolarAngle={Math.PI / 4}
           target={[0, 0, 0]}

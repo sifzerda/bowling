@@ -1,7 +1,10 @@
 # bowling
 
  + Borrows game world template from Matter.js 'xxx' demo
- + 
+
+
+To use custom 3D models:
+-  for obj files: @react-three/drei's useLoader hook
 
 
 ## Bowling in Three-Fiber
