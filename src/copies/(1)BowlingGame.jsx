@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
-import { Physics, useBox, useSphere, usePlane, Debug } from '@react-three/cannon';
+import { Physics, useBox, usePlane, useSphere, Debug } from '@react-three/cannon';
 import { Vector3 } from 'three';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'; // Corrected import
 
 // Lights Component
 const Lights = () => {
@@ -44,7 +45,7 @@ const Lights = () => {
   );
 };
 
-// BowlingBall Component
+// Custom Bowling Ball Component with OBJ file
 const BowlingBall = ({ position }) => {
   const { forwardForce, lateralForce } = useControls('Ball Physics', {
     forwardForce: { value: 5, min: 1, max: 20, step: 0.5 },
@@ -56,6 +57,8 @@ const BowlingBall = ({ position }) => {
     position: position.toArray(),
     args: [0.5],
   }));
+
+  const obj = useLoader(OBJLoader, '/models/Bowling_Ball_OBJ.obj'); // Path to your OBJ file
 
   const handleKeyDown = (event) => {
     switch (event.key) {
@@ -85,8 +88,7 @@ const BowlingBall = ({ position }) => {
 
   return (
     <mesh ref={ref} castShadow>
-      <sphereGeometry args={[0.5, 32, 32]} />
-      <meshStandardMaterial color="blue" />
+      <primitive object={obj} />
     </mesh>
   );
 };
