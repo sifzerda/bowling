@@ -111,14 +111,14 @@ const BowlingPin = ({ position }) => {
 // BowlingLane Component
 const BowlingLane = () => {
   const [ref] = useBox(() => ({
-    position: [0, 0, 0],
-    args: [5, 0.1, 20], // Adjust these dimensions to fit the lane's size
-    isStatic: true, // This makes the lane immovable
+    position: [0, 0.8, 0],    // change 0.8 to 0.75 or 0.76 to hide the plane
+    args: [20, 0.1, 20],      // change 20 to make plane wider
+    isStatic: true,          // Makes the lane immovable
   }));
 
   return (
     <mesh ref={ref} receiveShadow>
-      <boxGeometry args={[5, 0.1, 20]} />
+      <boxGeometry args={[20, 0.1, 20]} />  // Update geometry dimensions to match the new width
       <meshStandardMaterial color="grey" />
     </mesh>
   );
@@ -162,7 +162,7 @@ const App = () => {
           <primitive 
             object={obj} 
             ref={ref}
-            position={[0, -0.5, 0]} 
+            position={[0, -0.5, 0]}  
             scale={[1, 1, 1]}
             receiveShadow
           />
