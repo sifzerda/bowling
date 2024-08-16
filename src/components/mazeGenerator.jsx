@@ -1,7 +1,7 @@
-// MazeComponent.js
-import React from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Box, Plane, PerspectiveCamera, OrbitControls } from '@react-three/drei';
+import { useRef, useEffect, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Box, Plane, PerspectiveCamera, PointerLockControls } from '@react-three/drei';
+import * as THREE from 'three';
 
 // Maze generation function
 function generateMaze(width, height) {
@@ -59,18 +59,98 @@ const Archway = ({ position }) => (
     </>
 );
 
+const Player = ({ playerRef }) => {
+    const controlsRef = useRef();
+    const [jumping, setJumping] = useState(false);
+    const [velocityY, setVelocityY] = useState(0);
+    const [isGrounded, setIsGrounded] = useState(true);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (controlsRef.current) {
+                controlsRef.current.keys[event.key] = true;
+                if (event.key === ' ' && isGrounded) {
+                    setJumping(true);
+                }
+            }
+        };
+
+        const handleKeyUp = (event) => {
+            if (controlsRef.current) {
+                controlsRef.current.keys[event.key] = false;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [isGrounded]);
+
+    useFrame(({ clock }) => {
+        const speed = 0.1;
+        const gravity = -0.01;
+        const moveDistance = speed;
+
+        if (playerRef.current && controlsRef.current) {
+            const pos = playerRef.current.position;
+            const direction = new THREE.Vector3();
+            playerRef.current.getWorldDirection(direction);
+
+            if (controlsRef.current.keys['w']) {
+                pos.add(direction.multiplyScalar(moveDistance));
+            }
+            if (controlsRef.current.keys['s']) {
+                pos.sub(direction.multiplyScalar(moveDistance));
+            }
+            if (controlsRef.current.keys['a']) {
+                direction.cross(new THREE.Vector3(0, 1, 0));
+                pos.add(direction.multiplyScalar(moveDistance));
+            }
+            if (controlsRef.current.keys['d']) {
+                direction.cross(new THREE.Vector3(0, -1, 0));
+                pos.add(direction.multiplyScalar(moveDistance));
+            }
+
+            // Handle jumping
+            if (jumping && isGrounded) {
+                setVelocityY(0.2); // Initial jump velocity
+                setJumping(false);
+                setIsGrounded(false);
+            }
+
+            // Apply gravity
+            if (!isGrounded) {
+                setVelocityY((prevVelocity) => prevVelocity + gravity);
+            }
+
+            // Update player position with gravity
+            pos.y += velocityY;
+
+            // Simple collision check with the ground
+            if (pos.y <= 0) {
+                pos.y = 0;
+                setIsGrounded(true);
+                setVelocityY(0);
+            }
+        }
+    });
+
+    return <PointerLockControls ref={controlsRef} />;
+};
+
 const MazeComponent = ({ width = 21, height = 21 }) => {
     const maze = generateMaze(width, height);
-
-    // Define entrance and exit positions
-    const entrance = [1, 0, 1];
-    const exit = [width * 2 - 1, 0, height * 2 - 1];
+    const playerRef = useRef(null);
 
     return (
         <div className="parent-container">
             <Canvas className="canvas" shadows>
-                <PerspectiveCamera makeDefault position={[0, 10, 30]} />
-                <OrbitControls />
+                {/* Positioning the camera higher and farther from the maze */}
+                <PerspectiveCamera makeDefault position={[0, 10, 15]} />
                 <ambientLight intensity={0.5} />
                 <spotLight position={[10, 20, 10]} angle={0.15} penumbra={1} />
 
@@ -93,7 +173,7 @@ const MazeComponent = ({ width = 21, height = 21 }) => {
 
                 {/* Render the floor */}
                 <Plane
-                    args={[width * 2, height * 2, 1, 1]} // width, height, segmentsWidth, segmentsHeight
+                    args={[width * 2, height * 2, 1, 1]} // Adjusted width and height
                     position={[width, 0, height]}
                     rotation={[-Math.PI / 2, 0, 0]}
                     receiveShadow
@@ -104,6 +184,9 @@ const MazeComponent = ({ width = 21, height = 21 }) => {
                 {/* Render entrance and exit archways */}
                 <Archway position={[1, 0, 1]} />
                 <Archway position={[width * 2 - 1, 0, height * 2 - 1]} />
+
+                {/* Render the player */}
+                <Player playerRef={playerRef} />
             </Canvas>
         </div>
     );
