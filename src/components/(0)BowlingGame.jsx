@@ -107,18 +107,32 @@ const BowlingBall = ({ position }) => {
   );
 };
 
-// BowlingPin Component
+// BowlingPin Component with Custom OBJ Model
 const BowlingPin = ({ position }) => {
-  const [ref] = useBox(() => ({
+  const [ref, api] = useBox(() => ({
     mass: 0.5,
     position: position.toArray(),
     args: [0.2, 1, 0.2],
   }));
 
+  const [obj, setObj] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loader = new OBJLoader();
+    loader.load('/public/models/Pin.obj', (loadedObj) => {
+      setObj(loadedObj);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <mesh ref={ref} castShadow>
-      <cylinderGeometry args={[0.2, 0.3, 1, 16]} />
-      <meshStandardMaterial color="white" />
+      {loading ? (
+        <meshBasicMaterial color="gray" />
+      ) : (
+        <primitive object={obj} />
+      )}
     </mesh>
   );
 };
