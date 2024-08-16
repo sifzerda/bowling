@@ -1,11 +1,11 @@
-// original with basic non-custom ball and pins
-
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
 import { Physics, useBox, useSphere, usePlane, Debug } from '@react-three/cannon';
 import { Vector3 } from 'three';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { useFrame } from '@react-three/fiber';
 
 // Lights Component
 const Lights = () => {
@@ -46,7 +46,7 @@ const Lights = () => {
   );
 };
 
-// BowlingBall Component
+// BowlingBall Component with OBJ Model
 const BowlingBall = ({ position }) => {
   const { forwardForce, lateralForce } = useControls('Ball Physics', {
     forwardForce: { value: 5, min: 1, max: 20, step: 0.5 },
@@ -56,8 +56,19 @@ const BowlingBall = ({ position }) => {
   const [ref, api] = useSphere(() => ({
     mass: 1,
     position: position.toArray(),
-    args: [0.5],
+    args: [0.5], // Adjust based on your model's scale
   }));
+
+  const [obj, setObj] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loader = new OBJLoader();
+    loader.load('/public/models/Ball.obj', (loadedObj) => {
+      setObj(loadedObj);
+      setLoading(false);
+    });
+  }, []);
 
   const handleKeyDown = (event) => {
     switch (event.key) {
@@ -87,8 +98,11 @@ const BowlingBall = ({ position }) => {
 
   return (
     <mesh ref={ref} castShadow>
-      <sphereGeometry args={[0.5, 32, 32]} />
-      <meshStandardMaterial color="blue" />
+      {loading ? (
+        <meshBasicMaterial color="gray" />
+      ) : (
+        <primitive object={obj} />
+      )}
     </mesh>
   );
 };
@@ -155,7 +169,7 @@ const App = () => {
         <Physics gravity={[0, -9.81, 0]} allowSleep={false}>
           {debugMode && <Debug />}
           <BowlingLane />
-          <BowlingBall position={new Vector3(0, 0.5, 0)} />
+          <BowlingBall position={new Vector3(0.5, 0.5, 15)} />
           {pinPositions.map((pos, index) => (
             <BowlingPin key={index} position={pos} />
           ))}

@@ -1,12 +1,15 @@
-// src/pages/Contact.js
- 
-import '../App.css';
- 
+// src/DrumMachine.js
+import '../bowling.css';
+import BowlingGame from "../components/(0)BowlingGame";
 
 const Contact = () => {
   return (
-    <div className="App">
- 
+    <div>
+      <h1>Vexflow Page</h1>
+      <p>Welcome to the Home Page!</p>
+
+<BowlingGame />
+
     </div>
   );
 };
